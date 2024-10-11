@@ -1,5 +1,7 @@
 package com.systex.lottery.service;
 
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Optional;
 
 import org.springframework.stereotype.Service;
@@ -10,8 +12,13 @@ import com.jayway.jsonpath.internal.function.text.Length;
 import com.systex.lottery.exception.MemberException;
 import com.systex.lottery.model.Member;
 import com.systex.lottery.model.MemberRepository;
+import com.systex.lottery.model.Result;
+import com.systex.lottery.utils.JwtUtil;
 
 import jakarta.annotation.Resource;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
+import jakarta.servlet.http.HttpSession;
 
 @Service
 public class MemberService {
@@ -47,14 +54,28 @@ public class MemberService {
 		Member member =new Member(username,DigestUtils.md5DigestAsHex(password.getBytes()));
 		memberRepository.save(member);
 	}
-	public Member login(Member memberdto) throws MemberException {
-		Optional<Member> memberOptional = memberRepository.queryByUserName(memberdto.getUsername());
+	public Member login(String username,String password) throws MemberException {
+		Optional<Member> memberOptional = memberRepository.queryByUserName(username);
 		Member memberDB = memberOptional.get();
 		
-		String encryptPassword = DigestUtils.md5DigestAsHex(memberdto.getPassword().getBytes());
+		if(!memberOptional.isPresent()) {
+			throw new MemberException(MemberException.USERNAME_NOT_EXISTED);
+		}
+		String encryptPassword = DigestUtils.md5DigestAsHex(password.getBytes());
 		if(!encryptPassword.equals(memberDB.getPassword())) {
 			throw new MemberException(MemberException.PASSWORD_ERROR);
 		}
+		
 		return memberDB;
+	}
+	public String setToken(HttpServletRequest request,HttpServletResponse response,Member memberDB) {
+			Map<String,Object> claims = new HashMap<>();
+			claims.put("USER_ID", memberDB.getId());
+			String token = JwtUtil.createJWT(JwtUtil.KEY, 60*60*1000, claims);
+			System.out.println(token);
+			HttpSession session =request.getSession();
+			session.setAttribute("token", token);
+			session.setMaxInactiveInterval(60*60);
+			return token;
 	}
 }

@@ -68,31 +68,31 @@ public class LotteryController {
 	/**
 	 * 如果登入成功就，就往session中存入token
 	 * */
-	@PostMapping("/login")
-	@ResponseBody
-	public Result login(@RequestBody Member member,HttpServletRequest request,HttpServletResponse response) {
-
-		Result result=null;
-
-		try {
-
-			Member memberDB = memberService.login(member);
-			Map<String,Object> claims = new HashMap<>();
-			claims.put("USER_ID", memberDB.getId());
-			String token = JwtUtil.createJWT(JwtUtil.KEY, 60*60*1000, claims);
-			System.out.println(token);
-			HttpSession session =request.getSession();
-			session.setAttribute("token", token);
-			session.setMaxInactiveInterval(60*60);
-			result = Result.success(token);
-			
-		}catch(Exception e) {		
-			System.out.println(e.getMessage());
-			result = Result.error(e.getMessage());
-		}
-
-		return result;
-	}
+//	@PostMapping("/login")
+//	@ResponseBody
+//	public Result login(@RequestBody Member member,HttpServletRequest request,HttpServletResponse response) {
+//
+//		Result result=null;
+//
+//		try {
+//
+//			Member memberDB = memberService.login(member);
+//			Map<String,Object> claims = new HashMap<>();
+//			claims.put("USER_ID", memberDB.getId());
+//			String token = JwtUtil.createJWT(JwtUtil.KEY, 60*60*1000, claims);
+//			System.out.println(token);
+//			HttpSession session =request.getSession();
+//			session.setAttribute("token", token);
+//			session.setMaxInactiveInterval(60*60);
+//			result = Result.success(token);
+//			
+//		}catch(Exception e) {		
+//			System.out.println(e.getMessage());
+//			result = Result.error(e.getMessage());
+//		}
+//
+//		return result;
+//	}
 	@GetMapping("/logout")
 	public String logout(HttpServletRequest request) {
 		request.getSession().invalidate();

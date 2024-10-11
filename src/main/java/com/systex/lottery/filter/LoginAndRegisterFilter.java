@@ -99,7 +99,23 @@ public class LoginAndRegisterFilter  implements Filter {
 			mapper.writeValue(httpServletResponse.getWriter(), Result.error(MemberException.CONFIRMPASSWORD_INVALID));
 			return;
 		}
-		// 3-3. 確認 username
+		// 3-3. 分別處理 login 、register、 check_user_name 
+		
+		// login 
+		if(pathNum==PATH_LOGIN) {
+
+			String token = null;
+			try {
+				Member memberDB = memberService.login(paramMap.get("username"),paramMap.get("password"));
+				 token = memberService.setToken(requestWrapper, httpServletResponse, memberDB);
+			}catch (Exception e) {
+				// TODO: handle exception
+				mapper.writeValue(httpServletResponse.getWriter(), Result.error(e.getMessage()));
+			}
+			mapper.writeValue(httpServletResponse.getWriter(), Result.success(token));
+			return;
+		}
+		//check_user_name || register
 		Optional<Member> member=null;
 		try {
 			 member =  memberService.queryMemberByName(paramMap.get("username"));
@@ -108,22 +124,18 @@ public class LoginAndRegisterFilter  implements Filter {
 			mapper.writeValue(httpServletResponse.getWriter(), Result.error(e.getMessage()));
 			return ;
 		}
-		
-		//register 帳號不能存在
-		if(pathNum!=PATH_LOGIN && member.isPresent()) {
+
+		if(member.isPresent()) {
 			mapper.writeValue(httpServletResponse.getWriter(), Result.error(MemberException.USERNAME_EXISTED));
 			return;
 		}
-		// login 帳號必須存在
-		else if(pathNum==PATH_LOGIN && !member.isPresent()) {
-			mapper.writeValue(httpServletResponse.getWriter(), Result.error(MemberException.USERNAME_NOT_EXISTED));
+		//PATH_CHECK_NAME 
+		if(pathNum==PATH_CHECK_NAME) {
+			mapper.writeValue(httpServletResponse.getWriter(), Result.success());
 			return;
 		}
-		//檢查username直接返回
-		else if(pathNum==PATH_CHECK_NAME) {
-			mapper.writeValue(httpServletResponse.getWriter(), Result.success());
-		}
 		chain.doFilter(requestWrapper, httpServletResponse);
+		
 		return;
 		
 	}

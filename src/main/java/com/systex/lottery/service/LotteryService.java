@@ -1,14 +1,23 @@
 package com.systex.lottery.service;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedList;
+import java.util.Map;
 import java.util.Set;
 import java.util.TreeSet;
 
 import org.springframework.stereotype.Service;
 
 import com.systex.lottery.exception.LotteryException;
+import com.systex.lottery.model.Member;
+import com.systex.lottery.model.Result;
+import com.systex.lottery.utils.JwtUtil;
+
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
+import jakarta.servlet.http.HttpSession;
 
 
 @Service
@@ -67,4 +76,5 @@ public class LotteryService {
 		}
 		return Integer.parseInt(sets);
 	}
+
 }
