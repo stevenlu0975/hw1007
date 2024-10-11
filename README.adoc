@@ -1,0 +1,50 @@
+= 1011hw-LOTTERY
+
+
+== 目錄
+
+
+* <<環境>>
+* <<邏輯說明>>
+* <<如何使用>>
+
+
+
+=== 環境
+java::
+----
+  java version "21.0.4" 2024-07-16 LTS
+  Java(TM) SE Runtime Environment (build 21.0.4+8-LTS-274)
+  Java HotSpot(TM) 64-Bit Server VM (build 21.0.4+8-LTS-274, mixed mode, sharing)
+----
+tomcat::
+----
+  Server version: Apache Tomcat/10.1.30
+  Server built:   Sep 13 2024 20:26:16 UTC
+  Server number:  10.1.30.0
+----
+
+=== 邏輯說明
+
+. 使用filter 攔截非登入、登出、註冊功能，當有其非正常請求時，皆會倒重倒首頁。
+. 使用者登入後，配發token ，並在session 中也保存一份。
+. 登入成功後，token 未過期之前或是進行登出之前，可以訪問lottery。
+
+=== 測試數據
+
+測試 產生樂透號碼用，token在登入後返回
+----
+url : http://localhost:8080/lottery/lotteryController.do
+method : POST
+header: 
+    Content-Type:application/json
+    Authorization:token
+Json: {"sets":"2","excludeNumbersString":"1 2 3 4 5"}
+----
+
+=== 如何使用
+
+- 首頁網址如下:
+----
+  http://localhost:8080/lottery/index.html
+----
